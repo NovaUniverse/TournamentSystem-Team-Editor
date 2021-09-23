@@ -1,0 +1,20 @@
+.t-fit {
+	white-space: nowrap;
+	width: 1%;
+}
+
+.clickable {
+	cursor: pointer;
+}
+
+.hidden-until-loaded {
+	display: none;
+}
+
+.vanta-canvas {
+	z-index: -1 !important;
+}
+
+#app {
+	background-color: #FFFFFF;
+}
