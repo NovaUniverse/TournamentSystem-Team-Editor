@@ -33,7 +33,7 @@ $(function () {
 
 	$("#btn_add_player").on("click", function () {
 		if ($('.player-tr[data-uuid="' + addPlayerUUID + '"]').length > 0) {
-			showError("That player has already been added");
+			toastr.error("That player has already been added");
 		} else {
 			$("#btn_add_player").prop('disabled', true);
 			//console.log("add player " + addPlayerUUID + " " + addPlayerUsername);
@@ -95,14 +95,14 @@ $(function () {
 	$("#btn_upload_team_data").on("click", function () {
 		$.ajax({
 			type: "POST",
-			url: "/api/uppload_team",
+			url: "/api/team/uppload_team?access_token=" + localStorage.getItem("token") ,
 			data: $("#json_output").text(),
 			success: function (data) {
 				console.log(data);
 				if (data.success) {
-					showMessage("Team upploaded to TournamentSystem");
+					toastr.info("Team upploaded to TournamentSystem");
 				} else {
-					showError("Failed to uppload team\n" + data.message);
+					toastr.error("Failed to uppload team\n" + data.message);
 				}
 			},
 			dataType: "json"
@@ -113,17 +113,17 @@ $(function () {
 
 	setCookie("exported_team_data", "", 0);
 
-	$.getJSON("/api/status", function (data) {
+	$.getJSON("/api/system/status?access_token=" + localStorage.getItem("token"), function (data) {
 		console.log("It seems like the team editor is running on the same web server as TournamentSystem");
 		$("#back_to_admin_li").show();
 		$("#btn_upload_team_data").show();
 
-		$.getJSON("/api/export_team_data", function (data) {
+		$.getJSON("/api/team/export_team_data?access_token=" + localStorage.getItem("token"), function (data) {
 			data.teams_data.forEach(element => {
 				addPlayer(element.uuid, element.username, element.team_number);
 			});
 
-			showInfo("Team data loaded from TournamentSystem");
+			toastr.info("Team data loaded from TournamentSystem");
 		});
 	});
 
@@ -170,7 +170,7 @@ $(function () {
 			$("#team_json_data").val("");
 			$("#json_file_uppload").val("");
 		} catch (err) {
-			showError("Invalid JSON provided. Check if the data is valid and try again");
+			toastr.error("Invalid JSON provided. Check if the data is valid and try again");
 			console.error(err);
 		}
 	});
@@ -267,11 +267,11 @@ function searchPlayer() {
 					$("#btn_add_player").trigger('focus');
 				});
 			} else {
-				showError("Could not find player");
+				toastr.error("Could not find player");
 			}
 		});
 	} else {
-		showError("Please provide a username");
+		toastr.error("Please provide a username");
 	}
 }
 
@@ -328,28 +328,4 @@ function sortTable() {
 
 function fixUUID(uuid) {
 	return uuid.substr(0, 8) + "-" + uuid.substr(8, 4) + "-" + uuid.substr(12, 4) + "-" + uuid.substr(16, 4) + "-" + uuid.substr(20);
-}
-
-function showInfo(message) {
-	showMessage(message, "info");
-}
-
-function showWarning(message) {
-	showMessage(message, "warning");
-}
-
-function showError(message) {
-	console.warn(message);
-	showMessage(message, "danger");
-}
-
-function showMessage(message, type) {
-	$.notify({
-		message: message
-	}, {
-		type: type,
-		allow_dismiss: true,
-		delay: 3000,
-		z_index: 1337
-	});
 }
